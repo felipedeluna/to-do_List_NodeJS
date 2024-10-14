@@ -12,8 +12,17 @@ async function adicionarTarefa(req, res){
         await novaTarefa.save();
         return res.status(201).json(novaTarefa)
     }catch(err){
-        return res.status(500).json({ error: err.message});
+        return res.status(500).json({ error: 'Erro ao adicionar tarefa'});
     }
 }
 
-module.exports = { adicionarTarefa }
+async function listarTarefas(req, res){
+    try{
+        const tarefas = await Tarefa.find({ usuario: req.usuario.id }).sort({ dataCriacao: -1 });
+        return res.json(tarefas);
+    }catch(err){
+        return res.status(500).json({ error: 'Erro ao listar tarefas'});
+    }
+}
+
+module.exports = { adicionarTarefa, listarTarefas }
