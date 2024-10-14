@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const authRoutes = require('./routes/authRoutes')
 const app = express();
 
 app.use(express.json());
@@ -15,5 +16,7 @@ app.get('/login', (req, res) => {
 app.get('/registro', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/html/registro.html'));
 })
+
+app.use('/usuario', authRoutes)
 
 module.exports = app;
