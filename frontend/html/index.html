@@ -12,9 +12,10 @@
 
     <nav class="navbar">
         <div class="container d-flex justify-content-end px-0">
-            <a class="btn btn-primary" href="/login" role="button">Login</a>
-            <span class="mx-3">|</span>
-            <a class="btn btn-secondary" href="/registro" role="button">Registrar</a>
+            <a class="btn btn-primary" href="/login" id="loginButton" role="button">Login</a>
+            <span id="tracoLogin" class="mx-3">|</span>
+            <a class="btn btn-secondary" href="/cadastro" id="cadastroButton" role="button">Cadastrar</a>
+            <button class="btn btn-danger" id="logoutButton" role="button" onclick="logout()">Logout</button>
         </div>
     </nav>
 

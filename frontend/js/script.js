@@ -2,7 +2,13 @@ $(document).ready(async function (){
     
   let token = localStorage.getItem('token');
   if (token) {
-    await carregarTarefas();
+    $('#loginButton').hide();
+    $('#cadastroButton').hide();
+    $('#tracoLogin').hide();
+    carregarTarefas();
+  }else{
+    alert('Crie uma conta ou entre em uma já existente para usar nossa aplicação!');
+    $('#logoutButton').hide();
   }
 
     //adicionar tarefa
@@ -26,8 +32,15 @@ $(document).ready(async function (){
           alert('success')
           await carregarTarefas();
         }catch(error){
-          confirm('error', error)
-          alert(error.responseJSON?.error || 'Erro ao adicionar tarefa. Tente novamente.');
+          if(!localStorage.getItem('token')){
+            alert('É necessário estar autenticado para o uso da aplicação.');
+          }else if(error.responseJSON.error == 'Token inválido'){
+            localStorage.removeItem('token');
+            alert('Sessão encerrada, faça login novamente.');
+            window.location.href = '/login';
+          }else{
+            alert('Erro ao adicionar tarefas. Tente novamente.');
+          }
         }
     });
 
@@ -57,7 +70,7 @@ async function carregarTarefas(event) {
           <input class="form-check-input me-1 mt-0" type="checkbox" value="" id="checkbox-${tarefa._id}" ${checked}>
           <label class="form-check-label" for="checkbox-${tarefa._id}">${tarefa.titulo}</label>
         </div>
-          <button class="btn btn-danger btn-sm ms-2" type="button"><i class="bi bi-trash"></i></button>
+          <button class="btn btn-danger btn-sm ms-2" type="button" onclick="removerTarefa('${tarefa._id}')"><i class="bi bi-trash"></i></button>
         </li>  
       `)});
 
@@ -106,5 +119,25 @@ async function atualizarStatusTarefa(tarefaId, novoStatus) {
 //remover tarefa
 async function removerTarefa(tarefaId) {
   token = localStorage.getItem('token');
+
+  try {
+    await $.ajax({
+        url: `api/tasks/${tarefaId}`,
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+        contentType: 'application/json',
+    });
+
+    carregarTarefas();
+} catch (error) {
+    console.error('Erro ao atualizar status da tarefa:', error);
+    alert('Erro ao atualizar status da tarefa. Tente novamente.');
+}
+}
+
+async function logout(){
+  localStorage.removeItem('token');
+  alert('Sessão encerrada');
+  window.location.href = '/';
 }
 

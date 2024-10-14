@@ -46,4 +46,23 @@ async function atualizarStatusTarefa(req, res){
 
 }
 
-module.exports = { adicionarTarefa, listarTarefas, atualizarStatusTarefa }
+async function removerTarefa(req, res){
+    const { id } = req.params;
+
+    try{
+        const tarefa = await Tarefa.deleteOne(
+            {_id:id, usuario: req.usuario.id}, 
+            { new: true }
+        );
+
+        if(!tarefa){
+            return res.status(404).json({ error: 'Tarefa não encontrada'});
+        }
+        return res.json(tarefa);
+}catch(err){
+    return res.status(500).json({ error: 'Erro ao excluir tarefa'});
+}
+
+}
+
+module.exports = { adicionarTarefa, listarTarefas, atualizarStatusTarefa, removerTarefa}
