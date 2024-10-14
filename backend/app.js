@@ -13,10 +13,10 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/html/login.html'));
 })
-app.get('/registro', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/html/registro.html'));
+app.get('/cadastro', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/html/cadastro.html'));
 })
 
-app.use('/usuario', authRoutes)
+app.use('/api/usuario', authRoutes)
 
 module.exports = app;

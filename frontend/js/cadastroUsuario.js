@@ -12,7 +12,7 @@ $('#formularioCadastro').submit(async (evento) => {
 
     try {
         const response = await $.ajax({
-            url: '/usuario/registrar',
+            url: '/api/usuario/cadastrar',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ email, senha })
