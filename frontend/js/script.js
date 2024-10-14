@@ -2,14 +2,28 @@ $(document).ready(function (){
     
 
     //adicionar tarefa
-    $('#formularioTarefas').submit(function(event){
+    $('#formularioTarefas').submit(async(event)=>{
         event.preventDefault();
 
+        const token = localStorage.getItem('token');
         const novaTarefa = $('#novaTarefa').val();
-        
-        console.log(novaTarefa)
 
-        $('#novaTarefa').val("")
+        try{
+          await $.ajax({
+            url: 'api/tasks/',
+            method: 'POST',
+            contentType: 'application/json',
+            headers: { Authorization: `Bearer ${token}` },
+            data: JSON.stringify({ titulo: novaTarefa })
+            
+          })
+
+          $('#novaTarefa').val('');
+          alert('success')
+        }catch(error){
+          confirm('error', error)
+          alert(error.responseJSON?.error || 'Erro ao adicionar tarefa. Tente novamente.');
+        }
     });
 
     //remover tarefa

@@ -33,7 +33,7 @@ async function logar(req, res) {
         }
 
         // Gera o token JWT
-        const token = jwt.sign({ id: usuario.id }, 'secretKey', { expiresIn: '3600' });
+        const token = jwt.sign({ id: usuario.id }, 'secretKey', { expiresIn: '1h' });
         console.log(token);
         return res.json({token, email});
 

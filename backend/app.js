@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes')
+const taskRoutes = require('./routes/taskRoutes')
 const app = express();
 
 app.use(express.json());
@@ -18,5 +19,6 @@ app.get('/cadastro', (req, res) => {
 })
 
 app.use('/api/usuario', authRoutes)
+app.use('/api/tasks', taskRoutes)
 
 module.exports = app;
