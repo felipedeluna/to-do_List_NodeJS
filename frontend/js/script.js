@@ -63,15 +63,48 @@ async function carregarTarefas(event) {
 
 
   }catch(error){
-      console.error('Erro ao carregar tarefas:', error);
-      alert('Erro ao carregar tarefas. Tente novamente.');
+      console.error('Erro ao carregar tarefas:', error.responseJSON);
+      if(error.responseJSON.error == 'Token inválido'){
+        localStorage.removeItem('token');
+        alert('Sessão encerrada, faça login novamente.');
+        window.location.href = '/login';
+      }else{
+        alert('Erro ao carregar tarefas. Tente novamente.');
+      }
   }
 
 }
 
+//captura a mudança de estado do checkbox
+$('#listaDeTarefas').on('change', 'input[type="checkbox"]', function() {
+  const tarefaId = $(this).attr('id').split('-')[1];
+  const novoStatus = $(this).is(':checked') ? 'concluido' : 'pendente';
+
+  atualizarStatusTarefa(tarefaId, novoStatus);
+});
+
+//atualizar status da tarefa
+async function atualizarStatusTarefa(tarefaId, novoStatus) {
+  token = localStorage.getItem('token');
+
+  try {
+      await $.ajax({
+          url: `api/tasks/${tarefaId}`,
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` },
+          contentType: 'application/json',
+          data: JSON.stringify({ status: novoStatus })
+      });
+
+      carregarTarefas();
+  } catch (error) {
+      console.error('Erro ao atualizar status da tarefa:', error);
+      alert('Erro ao atualizar status da tarefa. Tente novamente.');
+  }
+}
 
 //remover tarefa
 async function removerTarefa(tarefaId) {
-        
+  token = localStorage.getItem('token');
 }
 

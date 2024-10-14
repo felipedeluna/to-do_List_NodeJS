@@ -25,4 +25,25 @@ async function listarTarefas(req, res){
     }
 }
 
-module.exports = { adicionarTarefa, listarTarefas }
+async function atualizarStatusTarefa(req, res){
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try{
+        const tarefa = await Tarefa.findOneAndUpdate(
+            {_id:id, usuario: req.usuario.id}, 
+            { status },
+            { new: true }
+        );
+
+        if(!tarefa){
+            return res.status(404).json({ error: 'Tarefa não encontrada'});
+        }
+        return res.json(tarefa);
+}catch(err){
+    return res.status(500).json({ error: 'Erro ao atualizar status da tarefa'});
+}
+
+}
+
+module.exports = { adicionarTarefa, listarTarefas, atualizarStatusTarefa }
