@@ -29,7 +29,6 @@ $(document).ready(async function (){
           })
 
           $('#novaTarefa').val('');
-          alert('success')
           await carregarTarefas();
         }catch(error){
           if(!localStorage.getItem('token')){
