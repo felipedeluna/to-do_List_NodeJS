@@ -1,4 +1,5 @@
 const Tarefa = require('../models/tarefa')
+const redisClient = require('../config/redis')
 
 async function adicionarTarefa(req, res){
     const {titulo} = req.body;
@@ -10,18 +11,30 @@ async function adicionarTarefa(req, res){
         });
 
         await novaTarefa.save();
-        return res.status(201).json(novaTarefa)
+	await redisClient.del(req.usuario.id);
+        return res.status(201).json(novaTarefa);
     }catch(err){
         return res.status(500).json({ error: 'Erro ao adicionar tarefa'});
     }
 }
 
 async function listarTarefas(req, res){
+    const idUsuario = req.usuario.id
+
     try{
+	const tarefasRedis = await redisClient.get(idUsuario)
+
+	if(tarefasRedis){
+	    return res.json(JSON.parse(tarefasRedis))
+	}
+
         const tarefas = await Tarefa.find({ usuario: req.usuario.id }).sort({ dataCriacao: -1 });
+
+	await redisClient.setEx(idUsuario, 1800, JSON.stringify(tarefas))
+
         return res.json(tarefas);
     }catch(err){
-        return res.status(500).json({ error: 'Erro ao listar tarefas'});
+        return res.status(500).json({ error: err});
     }
 }
 
@@ -31,7 +44,7 @@ async function atualizarStatusTarefa(req, res){
 
     try{
         const tarefa = await Tarefa.findOneAndUpdate(
-            {_id:id, usuario: req.usuario.id}, 
+            {_id:id, usuario: req.usuario.id},
             { status },
             { new: true }
         );
@@ -39,6 +52,7 @@ async function atualizarStatusTarefa(req, res){
         if(!tarefa){
             return res.status(404).json({ error: 'Tarefa não encontrada'});
         }
+	await redisClient.del(req.usuario.id);
         return res.json(tarefa);
 }catch(err){
     return res.status(500).json({ error: 'Erro ao atualizar status da tarefa'});
@@ -51,13 +65,14 @@ async function removerTarefa(req, res){
 
     try{
         const tarefa = await Tarefa.deleteOne(
-            {_id:id, usuario: req.usuario.id}, 
+            {_id:id, usuario: req.usuario.id},
             { new: true }
         );
 
         if(!tarefa){
             return res.status(404).json({ error: 'Tarefa não encontrada'});
         }
+	await redisClient.del(req.usuario.id);
         return res.json(tarefa);
 }catch(err){
     return res.status(500).json({ error: 'Erro ao excluir tarefa'});
